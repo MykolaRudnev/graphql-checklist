@@ -73,6 +73,22 @@ function App() {
     console.log('added todo',data); 
   }
 
+  async function handleDeleteTodo({id}){
+   const isConfirmed= window.confirm('Do you want to delete this todo?')
+    if(isConfirmed) {
+     const data = await deleteTodo({ 
+       variables: {id},
+      update: cache => {
+        const prevData = cache.readQuery({query: GET_TODOS})
+        const newTodos = prevData.todos.filter(todo => todo.id !== id);
+        cache.writeQuery({ query: GET_TODOS, data:{ todos: newTodos}});
+      }
+      });
+     console.log('deleted todo',data)
+    }
+  }
+
+
   if(loading) return <div>loading todos..</div>
   
   if(error) return <div>Error fatching todos</div>
@@ -107,11 +123,11 @@ function App() {
             list pa1 f3 ${todo.done && 'strike'}`}
             >{todo.text} </span>
             <button
-            className="bg-transpare nt bn f4">
-              <span className="red">
-                &times; 
-              </span>
-              
+              onClick={() => handleDeleteTodo(todo)}
+              className="bg-transpare nt bn f4">
+                  <span className="red">
+                    &times; 
+                  </span>
             </button>
           </p>
           ))}
